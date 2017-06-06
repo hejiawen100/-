@@ -1,3 +1,5 @@
+//Demo1  use Vue
+
 var vue = new Vue({
   el: '#fileUpload',
   data: {
@@ -20,8 +22,6 @@ var vue = new Vue({
   }
 })
 
- 
-
 <div id="fileUpload">
 <ul>
 <template v-for="item in items">
@@ -32,3 +32,71 @@ var vue = new Vue({
 <input type="file" id="file" v-on:change="mychange()" accept="image/*" multiple="">
 </div>
 </div>
+
+
+Demo2 //兼容IE
+
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title> New Document </title>
+  <style>
+	form{position:relative;}
+	.upload{background:#000;color:#fff;width:100px;height:30px;line-height:30px;text-align:center;cursor:pointer;}
+	input{position:absolute;top:0;left:0;height:30px;width:100px;opacity:0;filter:alpha(opacity=0);cursor:pointer;}
+  </style>
+ </head>
+ <body>
+	<form enctype="multipart/form-data" name="form1">
+		<input id="f" type="file" name="f" onchange="change()" />
+		<div class="upload">上传图片</div>
+		<p>预览:</p>
+		<p>
+			<img id="preview" alt="" name="pic" />
+		</p>
+	</form>
+	<script src="placeImage.js"></script>
+ </body>
+</html>
+
+function change() {
+	var pic = document.getElementById("preview"),
+	    file = document.getElementById("f");
+
+	var ext=file.value.substring(file.value.lastIndexOf(".")+1).toLowerCase();
+
+     // gif在IE浏览器暂时无法显示
+     if(ext!='png'&&ext!='jpg'&&ext!='jpeg'){
+         alert("图片的格式必须为png或者jpg或者jpeg格式！"); 
+		 return;
+     }
+	 var isIE = navigator.userAgent.match(/MSIE/)!= null,
+		 isIE6 = navigator.userAgent.match(/MSIE 6.0/)!= null;
+
+	 if(isIE) {
+		file.select();
+		var reallocalpath = document.selection.createRange().text;
+
+		// IE6浏览器设置img的src为本地路径可以直接显示图片
+         if (isIE6) {
+			pic.src = reallocalpath;
+		 }else {
+			// 非IE6版本的IE由于安全问题直接设置img的src无法显示本地图片，但是可以通过滤镜来实现
+             pic.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='image',src=\"" + reallocalpath + "\")";
+             // 设置img的src为base64编码的透明图片 取消显示浏览器默认图片
+             pic.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+		 }
+	 }else {
+		html5Reader(file);
+	 }
+}
+
+ function html5Reader(file){
+     var file = file.files[0];
+     var reader = new FileReader();
+     reader.readAsDataURL(file);
+     reader.onload = function(e){
+         var pic = document.getElementById("preview");
+         pic.src=this.result;
+     }
+ }
