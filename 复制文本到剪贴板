@@ -1,0 +1,10 @@
+copyText (){
+	//获取文本框元素
+	let target = document.getElementsByTagName('textarea')[0]
+	//文本框获得焦点
+	target.focus()
+	//全选文本框内容
+	target.setSelectionRange(0,target.value.length)
+	//复制选择内容
+	document.execCommand('Copy')
+}
